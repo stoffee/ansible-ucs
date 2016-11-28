@@ -1,2 +1,2 @@
 # ansible-ucs
-UCS Deployments using Ansible and UCSMSDK
+Automated Infrastructure Deployment using Ansible and UCSMSDK
