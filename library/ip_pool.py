@@ -111,7 +111,7 @@ def get_ip_pool(handle, org_obj, name):
     ret_val = None
     filter_str = '(name, "{0}", type="eq")'.format(name)
     ip_pool_list = handle.query_children(in_mo=org_obj,
-                                      class_id=NamingId.IppoolPool,
+                                      class_id=IppoolPool.name,
                                       filter_str=filter_str,
                                       hierarchy=False)
     for ip_pool in ip_pool_list:
@@ -122,28 +122,32 @@ def get_ip_pool(handle, org_obj, name):
     return ret_val
 
 
-def vcon_present(handle, params):
-    """make the vcon"""
+def ip_pool_present(handle, params):
+    """make the IP Pool"""
 
     org_obj = get_org(handle, params['org_name'])
 
     if org_obj:
 
-        vnic_pol = VnicLanConnPolicy(parent_mo_or_dn=org_obj,
-                                     name=params['lan_con_name'],
-                                     descr=params['lan_con_descr'])
+        ip_pool_pool = IPPoolPool(parent_mo_or_dn=org_obj,
+                                     name=params['name'],
+                                     desc=params['desc'])
+                                     netbios=params['is_net_bios_enabled'])
+                                     dhcp=params['supports_dhcp'])
+                                     order=params['assignment_order'])
 
-        for vnic in params['vnics']:
-            vnic = VnicEther(parent_mo_or_dn=vnic_pol,
-                             name=vnic['name'],
-                             order=str(vnic['order']),
-                             nw_templ_name=vnic['templ'],
-                             adaptor_profile_name=vnic['policy'])
+        for ip_pool in params['ippoolPool']:
+            ip_pool = IP_Pool(parent_mo_or_dn=ip_pool_pool,
+                             name=ip_pool['name'],
+                             desc=ip_pool['desc'],
+                             netbios=ip_pool['netbios']),
+                             dhcp=ip_pool['dhcp']),
+                             order=str(ip_pool['order'])
 
-        handle.add_mo(vnic_pol, True)
+        handle.add_mo(ip_pool_pool, True)
         handle.commit()
 
-        if get_vcon(handle, org_obj, params['lan_con_name']):
+        if get_ip_pool(handle, org_obj, params['name']):
             #return ({'changed': True, 'failed': False})
             return True
     else:
